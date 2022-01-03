@@ -1,0 +1,4 @@
+baseurl:
+    #为多个项目配置项目的基础路径时，直接在下方以Key:value形式添加
+    wechatApi: https://api.weixin.qq.com/cgi-bin
+    forumphp: http://47.107.116.139/phpwind/

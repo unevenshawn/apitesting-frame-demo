@@ -1,0 +1,9 @@
+allure-pytest
+pyyaml
+requests
+pytest
+pytest-base-url
+pytest-html
+pytest-rerunfailures
+pytest-ordering
+pytest-xdist

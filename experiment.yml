@@ -1,0 +1,11 @@
+- assertion:
+    equal:
+      aa: ==bb
+      gg: is brother
+    contains:
+      - a
+      - b
+      - c
+      - d
+      - f
+- assertion:
