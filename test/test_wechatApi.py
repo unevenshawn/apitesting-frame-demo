@@ -6,21 +6,22 @@ import pytest
 
 from api import requestUtil, yamlUtil, fileUtil
 from api.requestUtil import RequestUtil
+from test.clsins import Inst
 
 
 class Test_Wechat:
 
-    session = RequestUtil(config_url="wechatApi").session
+    session = RequestUtil(config_url_name="wechatApi", classinstance=Inst())
     tempTag = ''
 
     #一个test方法，必须要对应一个yaml，因为不同的test_case，其数据请求是不相同的，后面的解析也不同，但是解析可以做到更好的robustness，将所有情况考虑在内，之后进行统一方法的调用
     # parametrize直接将yaml中的多条测试数据解析成一条一条的测试数据，不必再关注如何处理列表，只需关注列表中每一项的数据
-    # @pytest.mark.parametrize("casedata",yamlUtil.read_yaml("test/wechat.yml"))
-    # # 封装的终极结果，就是要让facade界面，只调用了一个简单的方法，所有的内在逻辑都放入背后的api中
-    # def test_token(self,casedata):
-    #
-    #     self.session.standard_yaml(casedata)
-    #
+    @pytest.mark.parametrize("casedata",yamlUtil.read_yaml("test/wechat.yml"))
+    # 封装的终极结果，就是要让facade界面，只调用了一个简单的方法，所有的内在逻辑都放入背后的api中
+    def test_token(self,casedata):
+
+        self.session.standard_yaml(casedata)
+
     #     result = Test_Wechat.session.request(method=method, url=url, params=data)
     #     access_token = result.json()['access_token']
     #     yamlUtil.write_to_extract_yml({'access_token': access_token})

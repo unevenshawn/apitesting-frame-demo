@@ -30,7 +30,6 @@ def read_yaml(filename):
 def read_yaml_bykeys(filename, *keys):
     data = read_yaml(filename)
     for key in keys:
-        print("\n------")
         data = data[key]
         # print(f"key is {i}")
     return data
@@ -50,7 +49,9 @@ def read_conf_yml(*keys):
         data=read_yaml_bykeys("config.yml",*keys)
         return data
 
-
+def read_config_yaml_by_keys(*keys):
+    data = read_yaml_bykeys("config.yml", *keys)
+    return data
 
 
 def read_extract_yaml_by_keys(*keys):

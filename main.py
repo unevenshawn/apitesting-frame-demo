@@ -3,20 +3,22 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import json
+import os
+import re
 
 import yaml
 from jsonpath import jsonpath
 
 from api import yamlUtil
 
-j={
+j = {
     'name': 'wechat',
 
-            'url': "${expire}",
-            'method': 'get',
-            'data': {'grant_type': 'client_credential',
-                     'appid': 'wx92dba2d5e2235bf6',
-                     'secret': '93ab60fda4d17acf364123${expire}'},
+    'url': "${expire}",
+    'method': 'get',
+    'data': {'grant_type': 'client_credential',
+             'appid': 'wx92dba2d5e2235bf6',
+             'secret': '93ab60fda4d17acf364123${expire}'},
 
     'extract': {'access_token': '"access_token":(.*?)', 'expire_in': '$.expire_in'},
     'assertion': {
@@ -116,11 +118,12 @@ def get_index(string, target, start_index):
 遍历dict，对每一个key:value，找出value的type为str的
 value的中从${a}到实际值的对应，应该来自于yaml文件
 '''
-def dict_traverse_replace(diction,begin_char,end_char,**keymap):
 
+
+def dict_traverse_replace(diction, begin_char, end_char, **keymap):
     for key, value in diction.items():
         if hasattr(value, 'keys'):
-            dict_traverse_replace(value,begin_char,end_char, **keymap )
+            dict_traverse_replace(value, begin_char, end_char, **keymap)
             """
             #待解决，如果是list，该怎么迭代
         elif isinstance(value,list):
@@ -131,16 +134,17 @@ def dict_traverse_replace(diction,begin_char,end_char,**keymap):
         else:
             # 后续需要考虑，如果value为数组，那么要怎么办
             if type(value) == str:
-                diction[key]=replace_certain_keys(value,begin_char,end_char,**keymap)
+                diction[key] = replace_certain_keys(value, begin_char, end_char, **keymap)
+
 
 # print(dict_traverse_replace({'a':'${expire}'}, "${", "}", **{"access": "jess", "expire": 2190}))
 
 def replace_certain_keys(string, begin_char, end_char, **keymap):
-    if string.count(begin_char)==0:
+    if string.count(begin_char) == 0:
         return string
-    temp_type=None
+    temp_type = None
     new_string = ""
-    flag2int=string.count(begin_char)==1 and string.index(begin_char)==0
+    flag2int = string.count(begin_char) == 1 and string.index(begin_char) == 0
     """
     在这儿需要增加针对多个`${}`的加减乘除运算，这儿只考虑了{"a":${intvalue}}这一种值为int的情况
     """
@@ -164,7 +168,6 @@ def replace_certain_keys(string, begin_char, end_char, **keymap):
     if flag2int and (temp_type is int or temp_type is float):
         new_string = temp_type(string)
     return new_string
-
 
 
 def read_yaml_by_key(key):
@@ -202,6 +205,19 @@ def aa():
     print(a == b)
 
 
+def t():
+    a = '{"access_token":"52_AATd_AmvRWVVKl7gKuRjeUA0f0aU2oWSopE0SUTigIze0IL9Y_wGmoM1JnEqQrA7bBrQyk7QTHoMgjDDv2s1au1CB3IxfEwWArXJqr6ozDX9RlWBGsIGof5jhMSICzkBDBR23HpRhkFy3-YeOZBbAFAEPR","expires_in":7200}'
+    b = '"access_token":"(.*?)",'
+    rs = re.search(b, a)
+    print(rs.group(1))
+    res=jsonpath(json.loads("abscd"),"$.expires_in")
+    print(res)
+    json.decoder.JSONDecodeError
+
+def join(*paths):
+    return os.path.join(*paths)
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # print("${access}".replace("${access}", "jess"))
@@ -211,5 +227,4 @@ if __name__ == '__main__':
     # print(j)
     # print(type(replace_certain_keys("${expire}", "${", "}", **{"access": "jess", "expire": 2190})))
     # print(type(123) is int)
-
-    print()
+    t()

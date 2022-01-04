@@ -21,7 +21,7 @@ def truncate_yml():
     f = open(file="extract.yml", mode="wb")
     if f is not None:
         f.truncate()
-    print("truncate  extract.yml")
+
 
 
 @pytest.fixture(scope="function", autouse=False)

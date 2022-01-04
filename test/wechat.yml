@@ -1,24 +1,30 @@
 - # 每一条测试数据前面加‘-’，每条测试数据以'-'开始，多条测试数据在yaml中作为数组形式
   # 每一条测试数据的结构必须相同
   #一级目录必须包含name，request和assertion
+  test:
+#    f: ${aa}
+#    bcd: ${bcd}
+    func: '@{tt()}'
   name: wechat
   request:
-    url: https://api.weixin.qq.com/cgi-bin/token
+    url: /token
     method: get
     #各类请求方式和关键字的使用：
     # get用params，
     # post用data，如果用json传参，那么关键字用json
     # 文件上传用files
-    data:
+    params:
       grant_type: client_credential
       appid: wx92dba2d5e2235bf6
       secret: 93ab60fda4d17acf3641232de67f6dd3
+    headers:
+      Content-type: '*'
   # extract表示从结果中提取出指定内容，作为全局变量（参考postman），存入项目中的extract.yml中，在其它地方使用时以${key}的形式获取
   # extract的匹配，如果使用正则表达式，那么选用(.*?)或者(.+?)的形式进行匹配，暂不支持复杂的正则表达式形式进行提取
   # extract的匹配还支持jsonpath进行提取，使用方式为$.key
   extract:
-    access_token: '"access_token":(.*?)'
-    expire_in: $.expire_in
+    access_token: '"access_token":"(.*?)"'
+    expire_in: $.expires_in
   assertion:
     equals:
       #当前还不支持在list列表中取对应的extract_yaml值或调用对应的热加载函数方法
