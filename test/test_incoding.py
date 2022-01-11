@@ -8,7 +8,7 @@ class Test_in_Coding:
     #     print(data)
 
     # def test1(self):
-    #     d = yamlUtil.read_yaml("test/wechat.yml")
+    #     d = yamlUtil.read_yaml("test/test_get_token.yml")
     #     print(d)
     #     yamlUtil.write_to_extract_yml(
     #         {"dd": "pp"}

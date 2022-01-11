@@ -20,7 +20,7 @@ import yaml
 # 追加读模式
 # a + 能读，但读不到内容，因为文件指针默认在最后一行，可用seek移动文件指针位置
 
-#直接填写相对路径，而不用管项目路径
+# 直接填写相对路径，而不用管项目路径
 def read_yaml(filename):
     with open(file=os.path.join(get_path(), filename), mode="r", encoding="utf-8") as f:
         yamldata = yaml.load(f, Loader=yaml.FullLoader)
@@ -29,8 +29,11 @@ def read_yaml(filename):
 
 def read_yaml_bykeys(filename, *keys):
     data = read_yaml(filename)
-    for key in keys:
-        data = data[key]
+    if (len(keys) == 1):
+        data = data[keys[0]]
+    else:
+        for key in keys:
+            data = data[key]
         # print(f"key is {i}")
     return data
 
@@ -46,8 +49,9 @@ def write_to_extract_yml(data):
 
 
 def read_conf_yml(*keys):
-        data=read_yaml_bykeys("config.yml",*keys)
-        return data
+    data = read_yaml_bykeys("config.yml", *keys)
+    return data
+
 
 def read_config_yaml_by_keys(*keys):
     data = read_yaml_bykeys("config.yml", *keys)
@@ -61,6 +65,12 @@ def read_extract_yaml_by_keys(*keys):
 
 def get_path():
     return os.getcwd()
+
+
+def not_project_read(filename):
+    with open(file=filename, mode="r", encoding="utf-8") as f:
+        yamldata = yaml.load(f, Loader=yaml.FullLoader)
+        return yamldata
 
 
 if __name__ == '__main__':

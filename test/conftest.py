@@ -23,7 +23,6 @@ def truncate_yml():
         f.truncate()
 
 
-
 @pytest.fixture(scope="function", autouse=False)
 def use_base_url(first_layer, second_layer):
     yamldata = yamlUtil.read_conf_yml()

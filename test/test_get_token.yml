@@ -1,11 +1,12 @@
 - # 每一条测试数据前面加‘-’，每条测试数据以'-'开始，多条测试数据在yaml中作为数组形式
   # 每一条测试数据的结构必须相同
   #一级目录必须包含name，request和assertion
-  test:
-#    f: ${aa}
-#    bcd: ${bcd}
-    func: '@{tt()}'
-  name: wechat
+  name: ${ddt(name)}
+  #通过关键词parameterized，进行数据驱动
+  #如果使用数据驱动，那么在此yaml中只能写一组数据
+  parameterized:
+    # 通过${ddt(key)}获取数据驱动中的数据，其key必须存在于此处
+    name-grant_type-appid-secret-contains: data/testdrive.yaml
   request:
     url: /token
     method: get
@@ -14,26 +15,28 @@
     # post用data，如果用json传参，那么关键字用json
     # 文件上传用files
     params:
-      grant_type: client_credential
-      appid: wx92dba2d5e2235bf6
-      secret: 93ab60fda4d17acf3641232de67f6dd3
+      grant_type: ${ddt(grant_type)}
+      appid: ${ddt(appid)}
+      secret: ${ddt(secret)}
     headers:
       Content-type: '*'
   # extract表示从结果中提取出指定内容，作为全局变量（参考postman），存入项目中的extract.yml中，在其它地方使用时以${key}的形式获取
-  # extract的匹配，如果使用正则表达式，那么选用(.*?)或者(.+?)的形式进行匹配，暂不支持复杂的正则表达式形式进行提取
+  # extract的匹配，可以使用正则表达式，那么选用(.*?)或者(.+?)的形式进行匹配，暂不支持复杂的正则表达式形式进行提取
   # extract的匹配还支持jsonpath进行提取，使用方式为$.key
+  # ！！重要提醒，如果返回的结果中，数据类型是string，那么可以用正则和jsonpath两种方式匹配，如果是int,float的类型，那么必须用jsonpath的方式来匹配
+  #  如果非要用正则表达式提取值为int或float的，那么可以考虑try进行强转，如果转不成功，就不强转
   extract:
     access_token: '"access_token":"(.*?)"'
     expire_in: $.expires_in
   assertion:
-    equals:
+      equals:
+  #还要补充对not None的断言处理
       #当前还不支持在list列表中取对应的extract_yaml值或调用对应的热加载函数方法
-      - a: b
-      - c: d
-    contains:
-      - a
-      - b
-      - c
+#      - a: b
+#      - c: d
+      contains:
+        - ${ddt(contains)}
+        - expires_in
 
 
 

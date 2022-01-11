@@ -1,0 +1,15 @@
+- name: wechat
+  parameterized:
+    url-method-files-equals: data/testdrive.yaml
+  request:
+    url: media/uploadimg?access_token=@{read_extract_data(access_token)}
+    method: post
+    files:
+      media: test/test.jpeg
+#      access_token: '${access_token}'
+  assertion:
+    equals:
+      #当前还不支持在list列表中取对应的extract_yaml值或调用对应的热加载函数方法
+#      - {url: not None}
+    contains:
+      - http://mmbiz.qpic.cn/

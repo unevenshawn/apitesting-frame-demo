@@ -7,6 +7,7 @@ import requests
 from jsonpath import jsonpath
 
 from api import yamlUtil, fileUtil
+from api.logUtil import error_log, info_log
 from api.yamlUtil import read_yaml
 
 
@@ -25,35 +26,10 @@ class RequestUtil:
         return yamlUtil.read_config_yaml_by_keys('baseurl', self.project_base_url_name)
 
     def send_request(self, url, method, **kwargs):
-
+        info_log(f"请求内容:url->{url},method->{method},data->{kwargs}")
         return self.__session.request(url=url, method=method, **kwargs)
 
     def standard_yaml(self, yamldata):
-        """
-        yaml中数据读取出来后，得到的即是如下的数据内容
-
-        ls = [
-            {
-                'name': 'wechat',
-                'request':
-                    {
-                        'url': 'https://api.weixin.qq.com/cgi-bin/token',
-                        'method': 'get',
-                        'data': {'grant_type': 'client_credential',
-                                 'appid': 'wx92dba2d5e2235bf6',
-                                 'secret': '93ab60fda4d17acf3641232de67f6dd3'},
-                        'headers': {
-                            'Content'
-                        }
-                    },
-                'extract': {'access_token': '"access_token":(.*?)', 'expire_in': '$.expire_in'},
-                'assertion': {
-                    'equals': [{'a': 'b'}, {'c': 'd'}],
-                    'contains': ['a', 'b', 'c']
-                }
-            }
-        ]
-        """
         """
         有如下几部分
         1. 请求的封装，
@@ -66,20 +42,30 @@ class RequestUtil:
         
         """
 
-        self.has_necessary_keys(*['name', 'request', 'assertion'], **yamldata)
-        # 如果Extract_Yaml为空，会导致下面两个方法无法正确传参，但yaml为空时，还有可能有热加载函数
-        if self.extract_yaml is None:
-            self.extract_yaml = {}
-        # 通过下面两个方法，所有的@{}，${}都完成了替换
-        self.replace_extract_yaml(diction=yamldata, **self.extract_yaml)
-        self.replace_hotload_func(diction=yamldata, classinstance=self.classinstance,
-                                  **self.extract_yaml)
-        request_data = yamldata['request']
-        result = self.process_request(**request_data)
+        try:
+            self.has_necessary_keys(*['name', 'request', 'assertion'], **yamldata)
+            # 如果Extract_Yaml为空，会导致下面两个方法无法正确传参，但yaml为空时，还有可能有热加载函数
+            if self.extract_yaml is None:
+                self.extract_yaml = {}
+            # 通过下面两个方法，所有的@{}，${}都完成了替换
+            self.replace_extract_yaml(diction=yamldata, **self.extract_yaml)
+            self.replace_hotload_func(diction=yamldata, classinstance=self.classinstance,
+                                      **self.extract_yaml)
+            request_data = yamldata['request']
 
-        self.process_extract(result.text, **yamldata['extract'])
-
-        # self.process_assertion(result, **yamldata['assertion'])
+            result = self.process_request(**request_data)
+            restext = result.text
+            info_log(f"实际结果：{restext}")
+            if "extract" in yamldata.keys():
+                self.process_extract(result.text, **yamldata['extract'])
+            if "assertion" in yamldata.keys() and yamldata['assertion']:
+                self.process_assertion(result.text, **yamldata['assertion'])
+            info_log("接口请求成功")
+            info_log("------------------------------接口测试结束---------------------------------")
+        except Exception as e:
+            error_log(e)
+            info_log("接口请求失败")
+            info_log("------------------------------接口测试结束---------------------------------")
 
     def process_request(self, **yml_request_data):
         """
@@ -101,9 +87,10 @@ class RequestUtil:
         url = fileUtil.url_join(baseurl, yml_request_data['url'])
         method = yml_request_data['method']
         # print(f"method is {method}")
-        del yml_request_data['url']
+        yml_request_data.pop("url")
         del yml_request_data['method']
         self.is_method_data_match(method, **yml_request_data)
+        self.process_if_files(**yml_request_data)
         assert url is not None
         assert method is not None
 
@@ -112,8 +99,9 @@ class RequestUtil:
     def process_if_files(self, **kwargs):
         if "files" in kwargs.keys():
             value = kwargs["files"]
-            if value:
-                kwargs["files"] = open(value, 'rb')
+            if value and value.keys():
+                for valuekey, item in value.items():
+                    kwargs["files"][valuekey] = open(item, mode='rb')
 
     def format_method(self, method):
         return method.lower()
@@ -129,7 +117,6 @@ class RequestUtil:
                 raise KeyError("方法为post，请求参数应当为data或files")
 
     def process_extract(self, result, **extract_dict):
-
         # 尝试获取json格式的返回数据
         for key, value in extract_dict.items():
             # 正则表达式进行提取
@@ -142,7 +129,7 @@ class RequestUtil:
                 try:
                     json_result = json.loads(result)
                 except ValueError  as e:
-                    print(e)
+                    error_log(e)
                     continue
                 js_value = jsonpath(json_result, value)
                 if js_value:
@@ -156,16 +143,27 @@ class RequestUtil:
                 'contains': ['a', 'b', 'c']
                 }
         """
-        for key, value in assertion_dict.items():
-            if key == "equals":
-                equals = value
-            elif key == "contains":
-                contains = value
-        for element in equals:
-            for elekey, elevalue in element.items():
-                assert elekey == elevalue
-        for element in contains:
-            assert element in result
+        try:
+            result_str = result
+            if "\/" in result:
+                result_str = result.replace("\/", "/")
+            info_log(f"预期断言：{assertion_dict}")
+            new_result = json.loads(result_str)
+            if len(assertion_dict.items()) < 1:
+                return
+            for key, value in assertion_dict.items():
+                if key == "equals" and value is not None:
+                    equals = value
+                    for element in equals:
+                        if len(equals) == 0: break
+                        for elekey, elevalue in element.items():
+                            assert new_result[elekey] == elevalue
+                elif key == "contains":
+                    contains = value
+                    for element in contains:
+                        assert element in result_str
+        except Exception as e:
+            error_log(e)
 
     def replace_extract_yaml(self, diction, **extractyaml):
         self.dict_traverse_replace(diction, '${', '}', replace_certain_keys, **extractyaml)
@@ -185,7 +183,6 @@ class RequestUtil:
     '''
 
     def dict_traverse_replace(self, diction, begin_char, end_char, replace_for_one_func, classinstance=None, **keymap):
-
         for key, value in diction.items():
             if hasattr(value, 'keys'):
                 self.dict_traverse_replace(value, begin_char, end_char, replace_for_one_func,
@@ -265,14 +262,14 @@ def replace_method_for_hotload_func(string, begin_char, end_char, classinstance,
             func_bracket_end_index = instance_method_name.index(")")
             args = instance_method_name[func_bracket_start_index + 1:func_bracket_end_index].split(",")
             # 如果@{func(arg1,arg2,arg3)}中有的是extract中的变量，那么进行替换
-            for index in range(len(args)):
-                if args[index] in extract_yaml.keys():
-                    args[index] = extract_yaml[args[index]]
+            # for index in range(len(args)):
+            #     if args[index] in extract_yaml.keys():
+            #         args[index] = extract_yaml[args[index]]
             func_name = instance_method_name[0:func_bracket_start_index]
             func_result = None
             if classinstance == None:
                 print("传入热加载函数实例为空，或实例不存在")
-            if len(args) > 1:
+            if args[0] != '':
                 func_result = getattr(classinstance, func_name)(*args)
             else:
                 func_result = getattr(classinstance, func_name)()
@@ -319,10 +316,8 @@ def replace_certain_keys(string, begin_char, end_char, **keymap):
             new_value = None
             try:
                 new_value = keymap[key_for_keymap]
-
             except KeyError as e:
                 print(e, "extract.yml不存在该键")
-            else:
                 new_value = old_value
             # 判断Key对应的类型，如果不是整数，那么转换成string
             if type(new_value) is int or type(new_value) is float:

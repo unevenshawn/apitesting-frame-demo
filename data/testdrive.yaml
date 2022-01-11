@@ -1,0 +1,5 @@
+- [ name,grant_type,appid,secret, contains ]
+- [ 正例,client_credential,wx92dba2d5e2235bf6,93ab60fda4d17acf3641232de67f6dd3,access_token ]
+- [ 反例,client_credential,wx92dba2d5e2235bf6,None, access_token]
+- [ 反例,client_credential,None,93ab60fda4d17acf3641232de67f6dd3,access_token ]
+- [ 反例,client_credential,wx34cga,93ab6d3,access_token ]
