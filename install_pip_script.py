@@ -48,6 +48,7 @@ def excute_command_from_file(file, linehandler):
         for line in f:
             os.system(linehandler(line.strip()))
 
+
 # 设计思想，handler，这儿是拼接入pip的完整命令，如果是其它命令，就用其它的handler
 def piphandler(line: str):
     return f"pip install {line}"
@@ -57,7 +58,8 @@ def piphandler(line: str):
 if __name__ == '__main__':
     file = "requirements.txt"
     data = {"pytest": {"xdist", "ordering", "rerunfailures", "base-url", "html"},
-            "common": {"requests", "allure-pytest", "pyyaml"}}
+            "common": {"requests", "allure-pytest", "pyyaml", "openpyxl", "pymysql", "jsonpath", "flask", "rsa",
+                       "redis","webdriver-helper"}}
     write_requirements(data)
     # print(install_requirements(f"pip install -r {file}"))
     excute_command_from_file(file=file, linehandler=piphandler)

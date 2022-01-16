@@ -34,6 +34,10 @@ def join_path(filepath):
 def join(*paths):
     return os.path.join(*paths)
 
+def close(*filehandler):
+    for f in filehandler:
+        f.close()
+
 
 def get_path():
     return os.getcwd()

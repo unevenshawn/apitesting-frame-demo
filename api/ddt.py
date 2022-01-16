@@ -62,3 +62,4 @@ def process_parameterize(casedata):
             json_dict=json.loads(new_string)
         assembled.append(json_dict)
     info_log(f"数据驱动组装的数据为:{assembled}")
+    return assembled

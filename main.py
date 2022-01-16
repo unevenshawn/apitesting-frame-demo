@@ -11,10 +11,11 @@ import queue
 import re
 import time
 
+import openpyxl
 import yaml
 from jsonpath import jsonpath
 
-from api import yamlUtil, fileUtil, logUtil, ddt, funcUtil
+from api import yamlUtil, fileUtil, logUtil, ddt, funcUtil, excelUtil, encryptUtil, redisUtil
 
 j = {
     'name': 'wechat',
@@ -285,6 +286,22 @@ def dict_print(key, *value):
             print(f"dict的值为数值类型：{key}, {temp_value}")
 
 
+def b64():
+    ss = "hh".encode()
+    b_dc = base64.b64encode(ss).decode("utf-8")
+    print(b_dc)
+    bst = b_dc.encode('utf-8')
+    ac = base64.b64decode(bst)
+    print(ac)
+
+def redis_try():
+    con = redisUtil.connect()
+    print(con)
+    con.set("api_test_in_python", "to strive for better salary and life")
+    st:bytes=con.get("api_test_in_python")
+    print(st.decode("utf-8"))
+    con.close()
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # oldvalue = "${abc}"
@@ -298,7 +315,6 @@ if __name__ == '__main__':
     # logUtil.error_log("an error occurred")
     # logUtil.info_log("info to inform of you")
     # print(dt())
-    ddt.read_testcase_yaml("test/test_get_token.yml")
     # split_or_replace()
     # print(funcUtil.compare_if_same(['name', 'grant_type', 'appid', 'secret', 'equals'], ['name', 'grant_type', 'appid', 'secret', 'contains']))
     # print(fUtil.compare_if_same([1, 2, 3], [1, 2, 3]))
@@ -306,28 +322,12 @@ if __name__ == '__main__':
     # print(json.loads(funcUtil.replace_json_str_if_int(json.dumps(solid),"read_extract_data(access_token)",111)))
     # print("'"=='"')
     # funcUtil.dict_traverse(j, dict_print)
+    # ddt.read_testcase_yaml("test/test_get_token.yml")
+    # encryptUtil.gen_key("data")
+    # confid=encryptUtil.pbk_encrypt("data/public.pem","use my power")
+    # ct=encryptUtil.prk_decrypt("data/private.pem",confid)
+    # print(encryptUtil.b64encrypt("23"))
+    # print(encryptUtil.b64decode(encryptUtil.b64encode("utf")))
+    redis_try()
 
-    ts = [{'name': '正例', 'parameterized': {'name-grant_type-appid-secret-contains': 'data/testdrive.yaml'},
-           'request': {'url': '/token', 'method': 'get',
-                       'params': {'grant_type': 'client_credential', 'appid': 'wx92dba2d5e2235bf6',
-                                  'secret': '93ab60fda4d17acf3641232de67f6dd3'}, 'headers': {'Content-type': '*'}},
-           'extract': {'access_token': '"access_token":"(.*?)"', 'expire_in': '$.expires_in'},
-           'assertion': {'equals': None, 'contains': ['access_token', 'expires_in']}},
-          {'name': '反例', 'parameterized': {'name-grant_type-appid-secret-contains': 'data/testdrive.yaml'},
-           'request': {'url': '/token', 'method': 'get',
-                       'params': {'grant_type': 'client_credential', 'appid': 'wx92dba2d5e2235bf6', 'secret': 'None'},
-                       'headers': {'Content-type': '*'}},
-           'extract': {'access_token': '"access_token":"(.*?)"', 'expire_in': '$.expires_in'},
-           'assertion': {'equals': None, 'contains': ['access_token', 'expires_in']}},
-          {'name': '反例', 'parameterized': {'name-grant_type-appid-secret-contains': 'data/testdrive.yaml'},
-           'request': {'url': '/token', 'method': 'get', 'params': {'grant_type': 'client_credential', 'appid': 'None',
-                                                                    'secret': '93ab60fda4d17acf3641232de67f6dd3'},
-                       'headers': {'Content-type': '*'}},
-           'extract': {'access_token': '"access_token":"(.*?)"', 'expire_in': '$.expires_in'},
-           'assertion': {'equals': None, 'contains': ['access_token', 'expires_in']}},
-          {'name': '反例', 'parameterized': {'name-grant_type-appid-secret-contains': 'data/testdrive.yaml'},
-           'request': {'url': '/token', 'method': 'get',
-                       'params': {'grant_type': 'client_credential', 'appid': 'wx34cga', 'secret': '93ab6d3'},
-                       'headers': {'Content-type': '*'}},
-           'extract': {'access_token': '"access_token":"(.*?)"', 'expire_in': '$.expires_in'},
-           'assertion': {'equals': None, 'contains': ['access_token', 'expires_in']}}]
+    pass

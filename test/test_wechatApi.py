@@ -2,28 +2,32 @@ import json
 import os
 import random
 
+import allure
 import pytest
 import requests
 
-from api import requestUtil, yamlUtil, fileUtil
+from api import requestUtil, yamlUtil, fileUtil, ddt
 from api.requestUtil import RequestUtil
 from test.hot_load_class import Inst
 
 
+@allure.epic("shawn接口自动化开发")
+@allure.feature("微信测试模块")
 class Test_Wechat:
     session = RequestUtil(config_url_name="wechatApi", classinstance=Inst())
     tempTag = ''
 
+    @allure.story("测试access_token获取")
     # 一个test方法，必须要对应一个yaml，因为不同的test_case，其数据请求是不相同的，后面的解析也不同，但是解析可以做到更好的robustness，将所有情况考虑在内，之后进行统一方法的调用
     # parametrize直接将yaml中的多条测试数据解析成一条一条的测试数据，不必再关注如何处理列表，只需关注列表中每一项的数据
-    @pytest.mark.parametrize("casedata", yamlUtil.read_yaml("test/test_get_token.yml"))
+    @pytest.mark.parametrize("casedata", ddt.read_testcase_yaml("test/test_get_token.yml"))
     # # 封装的终极结果，就是要让facade界面，只调用了一个简单的方法，所有的内在逻辑都放入背后的api中
     def test_token(self, casedata):
         self.session.standard_yaml(casedata)
 
-    @pytest.mark.parametrize("casedata", yamlUtil.read_yaml("test/test_upload_file.yml"))
-    def test_uploadFile_new(self,casedata):
-
+    @allure.story("测试文件上传")
+    @pytest.mark.parametrize("casedata", ddt.read_testcase_yaml("test/test_upload_file.yml"))
+    def test_uploadFile_new(self, casedata):
         self.session.standard_yaml(casedata)
 
     # def test_uploadFile1(self):

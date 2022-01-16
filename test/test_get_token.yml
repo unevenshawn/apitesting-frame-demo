@@ -13,7 +13,7 @@
     #各类请求方式和关键字的使用：
     # get用params，
     # post用data，如果用json传参，那么关键字用json
-    # 文件上传用files
+    # 文件上传用files，请求方式一定是post
     params:
       grant_type: ${ddt(grant_type)}
       appid: ${ddt(appid)}

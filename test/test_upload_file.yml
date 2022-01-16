@@ -1,6 +1,6 @@
 - name: wechat
-  parameterized:
-    url-method-files-equals: data/testdrive.yaml
+#  parameterized:
+#    url-method-files-equals: data/testdrive.yaml
   request:
     url: media/uploadimg?access_token=@{read_extract_data(access_token)}
     method: post
