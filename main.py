@@ -328,6 +328,6 @@ if __name__ == '__main__':
     # ct=encryptUtil.prk_decrypt("data/private.pem",confid)
     # print(encryptUtil.b64encrypt("23"))
     # print(encryptUtil.b64decode(encryptUtil.b64encode("utf")))
-    redis_try()
+    # redis_try()
 
     pass

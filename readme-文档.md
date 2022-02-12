@@ -1,5 +1,13 @@
 # 自动化测试
 ## 接口自动化
+
+### 使用说明
+1. 在已经安装了python的环境下，先运行install_pip_script.py来安装必备的python插件，
+2. 如果要连接数据库、redis等，在项目根目录下配置confid.yml，用于存放和读取数据库用户名和密码，该文件已被添加在gitignore中，只会保存在本地
+3. 如果要运行脚本，run.py是入口
+4. 运行前要从`http://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login` 获取你的`appid`和`secret`，并作为用例配置到testdrive.yaml中
+5. 运行结果应该是4成功，3失败，3个失败的是testdrive.yaml中的反例
+
 ### 要点总结
 #### 前置内容
 
@@ -28,7 +36,7 @@
 
      
 
-#### 接下来要完成的内容
+#### 接下来要完成的内容（已完成）
 
 1. 完善`requestUtil`和`yamlUtil`的封装
 
@@ -58,28 +66,26 @@
          - d
          - f
    ```
+10. 完成异常处理和日志的封装
 
-   
+11. 多环境下，对`base_url`的封装，并实现根据配置环境自动加载
 
-8. 以下内容还没看过视频
+12. 接口的加密和签名
 
-9. 完成异常处理和日志的封装
-
-10. 多环境下，对`base_url`的封装，并实现根据配置环境自动加载
-
-11. 接口的加密和签名
-
-12. 完成allure生成报告的定制
+13. 完成allure生成报告的定制
 
 
-还需要完成的内容
+#### 还需要完成的内容
 1. 请求结果用正则表达式的形式进行提取
 2. 断言的处理，主要是断言如果不是返回的文本或json，该如何处理，一定要保证断言能够顺利执行，
 3. 对于${}的替换，感觉算法不是很完善，应该会有隐藏的bug，前期的递归遍历没有将list考虑进去
 4. 对于热加载函数和${}得到的变量，应该支持加减乘除的运算
-5. 
+5. 接口签名和接口加密的内容
+6. 将接口测试的框架和web测试的框架整合到一起
 
 
+
+`jenkins安装脚本`
 ```commandline
 sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/redhat-stable/jenkins.repo
@@ -88,6 +94,5 @@ sudo yum upgrade
 sudo yum install epel-release java-11-openjdk-devel
 sudo yum install jenkins
 sudo systemctl daemon-reload
-
 ```
 

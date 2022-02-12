@@ -30,17 +30,22 @@ class Test_Wechat:
     def test_uploadFile_new(self, casedata):
         self.session.standard_yaml(casedata)
 
-    # def test_uploadFile1(self):
-    #     method = "post"
-    #     #     # 文件上传关键点1，调用类名+字段名Test_Wechat，这样调用的是类的静态属性
-    #     #     # 猜测pytest框架在运行的时候，实际上实例化了多个测试类，所以导致如果绑定self.access_token，会导致无法绑定到同一个实例化对象上面。
-    #     url = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=" + yamlUtil.read_yaml("extract.yml")[
-    #         'access_token']
-    #     #     # 文件上传关键点2，上传的文件要用open打开，并且要作为'media'的键值，作为数据提交
-    #     file = {"files": {'media': open(file=fileUtil.join_path("test/test.jpeg"), mode = "rb")}}
-    #     result = requests.session().request(method=method, url=url, **file)
-    #     print(result.text.replace(r"\/", '/'))
-    #
+'''
+如果是线性脚本代码就是如下内容所示，上方的用例，进行了代码和数据分离，分了 util， api testcase和data四个层级，通过yaml文件进行了数据驱动
+
+# def test_uploadFile1(self):
+#     method = "post"
+#     #     # 文件上传关键点1，调用类名+字段名Test_Wechat，这样调用的是类的静态属性
+#     #     # 猜测pytest框架在运行的时候，实际上实例化了多个测试类，所以导致如果绑定self.access_token，会导致无法绑定到同一个实例化对象上面。
+#     url = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=" + yamlUtil.read_yaml("extract.yml")[
+#         'access_token']
+#     #     # 文件上传关键点2，上传的文件要用open打开，并且要作为'media'的键值，作为数据提交
+#     file = {"files": {'media': open(file=fileUtil.join_path("test/test.jpeg"), mode = "rb")}}
+#     result = requests.session().request(method=method, url=url, **file)
+#     print(result.text.replace(r"\/", '/'))
+#
+    
+    
 # def test_blackList(self):
 #     url = "https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=" + yamlUtil.read_yaml("extract.yml")['access_token']
 #     data = {
@@ -81,3 +86,4 @@ class Test_Wechat:
 #     result = Test_Wechat.session.post(url=url, json=data)
 #     print(result.text)
 #     print("删除成功") if result.json()['errcode'] == 0 else print("未删除成功")
+'''
